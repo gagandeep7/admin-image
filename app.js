@@ -72,14 +72,10 @@ app.delete("/images/:imageId", async (req, res) => {
         }
 
         const imagePath = image.path;
-        await image.remove();
+        await Image.deleteOne({ _id: imageId }); // Use deleteOne() to remove the image
         res.json({ message: "Image deleted successfully" });
-
-        // Optionally, you can also delete the physical image file from the 'uploads' directory
-        const fs = require("fs");
-        const filePath = `uploads/${imagePath}`;
-        fs.unlinkSync(filePath);
     } catch (error) {
+        console.log({ error });
         res.status(500).json({ error: "Internal server error", message: error });
     }
 });
