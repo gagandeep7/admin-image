@@ -8,12 +8,10 @@ const cors = require("cors");
 const multer = require("multer");
 const app = express();
 const PORT = process.env.PORT || 3000;
-console.log("Mongoose version:", mongoose.version);
 app.use(cors());
 try {
     let db = mongoose.connect(process.env.DB_URL, {
         useNewUrlParser: true,
-        // useFindAndModify: false,
         useUnifiedTopology: true,
     });
     console.log("Connected successfully");
@@ -61,6 +59,28 @@ app.get("/images", async (req, res) => {
         res.json(images);
     } catch (error) {
         res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+app.delete("/images/:imageId", async (req, res) => {
+    try {
+        const imageId = req.params.imageId;
+        const image = await Image.findById(imageId);
+
+        if (!image) {
+            return res.status(404).json({ error: "Image not found" });
+        }
+
+        const imagePath = image.path;
+        await image.remove();
+        res.json({ message: "Image deleted successfully" });
+
+        // Optionally, you can also delete the physical image file from the 'uploads' directory
+        const fs = require("fs");
+        const filePath = `uploads/${imagePath}`;
+        fs.unlinkSync(filePath);
+    } catch (error) {
+        res.status(500).json({ error: "Internal server error", message: error });
     }
 });
 
