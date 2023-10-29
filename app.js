@@ -22,7 +22,7 @@ try {
 }
 
 // Create a Mongoose model for the image collection
-const Image = mongoose.model("Image", new mongoose.Schema({ path: String, type: String }));
+const Image = mongoose.model("Image", new mongoose.Schema({ path: String, type: String, url: String, name: String }));
 
 // Set up multer for handling file uploads
 const storage = multer.diskStorage({
@@ -44,8 +44,8 @@ app.get("/images/:imagePath", (req, res) => {
 app.post("/upload", upload.single("image"), async (req, res) => {
     try {
         const { path } = req.file;
-        const { type } = req.body; // Capture the "type" from the request body
-        const image = new Image({ path, type });
+        const { type, url, name } = req.body; // Capture the "type" from the request body
+        const image = new Image({ path, type, url, name });
         await image.save();
         res.status(201).json({ message: "Image uploaded successfully" });
     } catch (error) {
